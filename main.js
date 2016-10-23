@@ -36,7 +36,7 @@ var app = express();
 var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var api = require('/routes/api')(io)
+var api = require('./routes/api')(io)
 
 
 var connectedUsersArray = [];
