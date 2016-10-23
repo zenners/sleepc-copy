@@ -46,18 +46,18 @@ var userId;
 
 var mongoose = require('mongoose');
 
-var dburi =
-    process.env.MONGODB_URI ||
-    process.env.MONGOHQ_URL ||
-    'mongodb://localhost/intel-iot';
+// var dburi =
+//     process.env.MONGODB_URI ||
+//     process.env.MONGOHQ_URL ||
+//     'mongodb://localhost/intel-iot';
 
-mongoose.connect(dburi, function (err, res) {
-    if (err) {
-    console.log ('ERROR connecting to: ' + dburi + '. ' + err);
-    } else {
-    console.log ('Succeeded connected to: ' + dburi);
-    }
-});
+// mongoose.connect(dburi, function (err, res) {
+//     if (err) {
+//     console.log ('ERROR connecting to: ' + dburi + '. ' + err);
+//     } else {
+//     console.log ('Succeeded connected to: ' + dburi);
+//     }
+// });
 
 app.use('/api', api);
 

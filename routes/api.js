@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var dataSchema = require('../models/data');
+// var dataSchema = require('../models/data');
 
 
 var returnRouter = function(io) {
@@ -9,14 +9,14 @@ var returnRouter = function(io) {
     });
 
     router.post('/report', function(req, res){
-	    var newData = new dataSchema(req.body)
-	    newData.save(function(err, res){
-	        if (err) console.log (err)
+	    // var newData = new dataSchema(req.body)
+	    // newData.save(function(err, res){
+	    //     if (err) console.log (err)
 
-	        console.log(res)
+	    //     console.log(res)
 
-	        io.emit('new data')
-	    })
+	    //     io.emit('new data')
+	    // })
 	})
 
     return router;
