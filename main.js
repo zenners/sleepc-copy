@@ -24,11 +24,11 @@ Review README.md file for in-depth information about web sockets communication
 
 */
 
-var mraa = require('mraa'); //require mraa
-console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the Intel XDK console
-//var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
-var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2 as well as Intel Edison)
-myOnboardLed.dir(mraa.DIR_OUT); //set the gpio direction to output
+// var mraa = require('mraa'); //require mraa
+// console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the Intel XDK console
+// //var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
+// var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2 as well as Intel Edison)
+// myOnboardLed.dir(mraa.DIR_OUT); //set the gpio direction to output
 var ledState = true; //Boolean to hold the state of Led
 
 var express = require('express');
@@ -36,14 +36,37 @@ var app = express();
 var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var api = require('/routes/api')(io)
+
 
 var connectedUsersArray = [];
 var userId;
+
+// mongodb
+
+var mongoose = require('mongoose');
+
+var dburi =
+    process.env.MONGODB_URI ||
+    process.env.MONGOHQ_URL ||
+    'mongodb://localhost/intel-iot';
+
+mongoose.connect(dburi, function (err, res) {
+    if (err) {
+    console.log ('ERROR connecting to: ' + dburi + '. ' + err);
+    } else {
+    console.log ('Succeeded connected to: ' + dburi);
+    }
+});
+
+app.use('/api', api);
 
 app.get('/', function(req, res) {
     //Join all arguments together and normalize the resulting path.
     res.sendFile(path.join(__dirname + '/client', 'index.html'));
 });
+
+
 
 //Allow use of files in client folder
 app.use(express.static(__dirname + '/client'));
@@ -60,17 +83,18 @@ io.on('connection', function(socket) {
         userId = "u0";
     }
     console.log('a user connected: '+userId);
-    io.emit('user connect', userId);
+    io.emit('user connect', connectedUsersArray);
     connectedUsersArray.push(userId);
     console.log('Number of Users Connected ' + connectedUsersArray.length);
     console.log('User(s) Connected: ' + connectedUsersArray);
     io.emit('connected users', connectedUsersArray);
-    
-    socket.on('user disconnect', function(msg) {
+
+    socket.on('disconnect', function(msg){
         console.log('remove: ' + msg);
         connectedUsersArray.splice(connectedUsersArray.lastIndexOf(msg), 1);
-        io.emit('user disconnect', msg);
-    });
+        io.emit('user disconnect', connectedUsersArray)
+    })
+    
     
     socket.on('chat message', function(msg) {
         io.emit('chat message', msg);
@@ -83,6 +107,10 @@ io.on('connection', function(socket) {
         io.emit('toogle led', msg);
         ledState = !ledState; //invert the ledState
     });
+
+    socket.on('appLoop', function(socket){
+        
+    })
     
 });
 
